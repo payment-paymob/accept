@@ -3,48 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إرسال البيانات إلى بوت تيليجرام</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-            background-color: #f4f4f4;
-        }
-        form {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px 0px #aaa;
-            display: inline-block;
-        }
-        label, input {
-            display: block;
-            margin: 10px auto;
-            width: 80%;
-        }
-        input[type="submit"] {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #218838;
-        }
-    </style>
+    <title>نموذج إدخال البيانات</title>
 </head>
 <body>
-    <h1>أدخل بياناتك</h1>
-    <form action="https://your-app-name.up.railway.app" method="POST">
-        <label for="name">الاسم:</label>
-        <input type="text" id="name" name="name" required>
+    <h2>أدخل بياناتك</h2>
+    <form id="userForm">
+        <label>الاسم:</label>
+        <input type="text" id="name" required><br><br>
 
-        <label for="email">البريد الإلكتروني:</label>
-        <input type="email" id="email" name="email" required>
+        <label>البريد الإلكتروني:</label>
+        <input type="email" id="email" required><br><br>
 
-        <input type="submit" value="إرسال">
+        <label>الرسالة:</label>
+        <textarea id="message" required></textarea><br><br>
+
+        <button type="submit">إرسال</button>
     </form>
+
+    <script>
+        document.getElementById('userForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            const response = await fetch('/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
 </body>
 </html>
