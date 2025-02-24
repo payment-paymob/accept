@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نموذج إدخال البيانات</title>
+    <title>إرسال البيانات إلى تليجرام</title>
 </head>
 <body>
     <h2>أدخل بياناتك</h2>
-    <form id="userForm">
+    <form id="dataForm">
         <label>الاسم:</label>
         <input type="text" id="name" required><br><br>
 
-        <label>البريد الإلكتروني:</label>
-        <input type="email" id="email" required><br><br>
+        <label>رقم الهاتف:</label>
+        <input type="text" id="phone" required><br><br>
 
         <label>الرسالة:</label>
         <textarea id="message" required></textarea><br><br>
@@ -21,22 +21,21 @@
     </form>
 
     <script>
-        document.getElementById('userForm').addEventListener('submit', async function(event) {
+        document.getElementById("dataForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            const data = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                message: document.getElementById('message').value
-            };
 
-            const response = await fetch('/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const message = document.getElementById("message").value;
 
-            const result = await response.json();
-            alert(result.message);
+            fetch("/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, phone, message })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert("حدث خطأ!"));
         });
     </script>
 </body>
