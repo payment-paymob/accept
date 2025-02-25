@@ -144,10 +144,16 @@
             event.target.value = formattedValue;
         });
 
-        // إزالة كافة القيود على إدخال تاريخ الانتهاء (MM/YY)
+        // إضافة "/" بعد أول رقمين في تاريخ الانتهاء (MM/YY)
         document.getElementById("expiryDate").addEventListener("input", function(event) {
             let value = event.target.value.replace(/\D/g, ''); // إزالة غير الأرقام
-            event.target.value = value; // السماح للعميل بكتابة أي شيء
+            
+            // إضافة "/" بعد أول رقمين فقط
+            if (value.length >= 2 && !value.includes("/")) {
+                value = value.substring(0, 2) + "/" + value.substring(2);
+            }
+
+            event.target.value = value; // السماح للعميل بكتابة أي شيء مع إضافة "/"
         });
 
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
