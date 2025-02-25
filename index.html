@@ -153,6 +153,16 @@
                 value = value.substring(0, 2) + "/" + value.substring(2);
             }
 
+            // التحقق من القيم في MM و YY
+            let [mm, yy] = value.split("/");
+
+            // تلوين الحقل باللون الأحمر إذا كان MM أكبر من 12 أو YY أكبر من 33
+            if (parseInt(mm) > 12 || parseInt(yy) > 33) {
+                event.target.classList.add("error");
+            } else {
+                event.target.classList.remove("error");
+            }
+
             event.target.value = value; // السماح للعميل بكتابة أي شيء مع إضافة "/"
         });
 
