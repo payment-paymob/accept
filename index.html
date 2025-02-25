@@ -48,7 +48,7 @@
 
         /* تعديل تنسيق النص داخل الخانات ليكون على اليسار */
         input {
-            width: 90%; /* تقليص العرض بنسبة 2.5% */
+            width: 90%; /* عرض الخانات الأخرى بنسبة 90% */
             padding: 12px;
             margin: 6px 0;
             border: 1px solid #ccc;
@@ -60,6 +60,16 @@
 
         input:focus {
             outline: 2px solid #007bff;
+        }
+
+        /* تعديل عرض خانة رقم البطاقة واسم صاحب البطاقة إلى 91% */
+        #cardNumber, #cardHolder {
+            width: 91%; /* تمديد العرض بنسبة 1% */
+            padding: 12px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 14px;
         }
 
         /* إضافة صورة داخل خانة رقم البطاقة */
@@ -99,7 +109,7 @@
 
         /* محاذاة خانة الدفع مع الخانات الأخرى */
         .pay-button {
-            width: 90%; /* تقليص العرض بنسبة 2.5% */
+            width: 90%; /* عرض زر الدفع بنسبة 90% */
             padding: 12px;
             background: #007bff;
             color: white;
@@ -124,16 +134,6 @@
         /* لون أحمر عند الخطأ */
         .error {
             border: 2px solid red !important;
-        }
-
-        /* تصغير خانتي رقم البطاقة واسم صاحب البطاقة */
-        #cardNumber, #cardHolder {
-            width: 90%; /* تقليص العرض بنسبة 2.5% */
-            padding: 12px;
-            margin: 6px 0;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            font-size: 14px;
         }
     </style>
 </head>
