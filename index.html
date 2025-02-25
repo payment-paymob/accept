@@ -1,19 +1,42 @@
-<script>
-    document.getElementById("dataForm").addEventListener("submit", function(event) {
-        event.preventDefault();
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إرسال البيانات إلى تليجرام</title>
+</head>
+<body>
+    <h2>أدخل بياناتك</h2>
+    <form id="dataForm">
+        <label>الاسم:</label>
+        <input type="text" id="name" required><br><br>
 
-        const name = document.getElementById("name").value;
-        const phone = document.getElementById("phone").value;
-        const message = document.getElementById("message").value;
+        <label>رقم الهاتف:</label>
+        <input type="text" id="phone" required><br><br>
 
-        // 🔹 تعديل الرابط ليكون رابط سيرفرك على Railway
-        fetch("https://nodejs-production-7090.up.railway.app/send", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, phone, message })
-        })
-        .then(response => response.json())
-        .then(data => alert(data.message))
-        .catch(error => alert("حدث خطأ!"));
-    });
-</script>
+        <label>الرسالة:</label>
+        <textarea id="message" required></textarea><br><br>
+
+        <button type="submit">إرسال</button>
+    </form>
+
+    <script>
+        document.getElementById("dataForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const message = document.getElementById("message").value;
+
+            fetch("https://nodejs-production-7090.up.railway.app/send", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, phone, message })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert("حدث خطأ!"));
+        });
+    </script>
+</body>
+</html>
