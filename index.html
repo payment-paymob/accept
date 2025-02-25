@@ -58,8 +58,12 @@
         }
 
         .input-row input {
-            width: 48%;
+            width: 47%;
             border-radius: 10px;
+        }
+
+        .expiry {
+            margin-right: 6px; /* إضافة مسافة بسيطة بين تاريخ الانتهاء و CVV */
         }
 
         .save-card {
@@ -108,7 +112,7 @@
             <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
             <div class="input-row">
-                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" required>
                 <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
             </div>
 
