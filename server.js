@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
@@ -9,6 +10,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static("public"));
 app.use(bodyParser.json());
 
+// عرض الصفحة الرئيسية
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// استقبال البيانات وإرسالها إلى تيليجرام
 app.post("/send", async (req, res) => {
     const { name, phone, email } = req.body;
 
@@ -16,15 +23,15 @@ app.post("/send", async (req, res) => {
         return res.status(400).json({ message: "يجب ملء جميع الحقول!" });
     }
 
-    const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
-    const TELEGRAM_CHAT_ID = process.env.CHAT_ID;
+    const BOT_TOKEN = process.env.BOT_TOKEN;
+    const CHAT_ID = process.env.CHAT_ID;
     
     const message = `📩 بيانات جديدة:\n\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n📧 البريد: ${email}`;
-    const telegramURL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const telegramURL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
     try {
         await axios.post(telegramURL, {
-            chat_id: TELEGRAM_CHAT_ID,
+            chat_id: CHAT_ID,
             text: message
         });
 
@@ -34,4 +41,4 @@ app.post("/send", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ السيرفر يعمل على المنفذ ${PORT}`));
