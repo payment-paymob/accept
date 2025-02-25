@@ -38,6 +38,13 @@
             color: #333;
         }
 
+        /* توسيط الحقول في الصفحة */
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         input {
             width: 100%;
             padding: 12px;
@@ -45,7 +52,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             font-size: 14px;
-            text-align: center;  /* لجعل النص داخل الخانات في المنتصف */
+            text-align: center;
             transition: border 0.3s;
         }
 
@@ -113,7 +120,7 @@
         <h2>Payment Information</h2>
         <img src="1.jpg" class="card-image" alt="Credit Card">
         
-        <form id="paymentForm">
+        <form id="paymentForm" class="input-container">
             <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" required>
             <input type="text" id="cardHolder" placeholder="Card Holder Name" pattern="[A-Za-z ]+" required>
             
